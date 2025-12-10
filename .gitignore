@@ -171,7 +171,8 @@ cython_debug/
 .pypirc
 
 # data folder
-data/
+#data/
+data/cleaned_data.csv
 
 # virtualenv
 spotify/
