@@ -55,7 +55,7 @@ def calculate_cosine_similarity(input_vector,data):
     similarity_score  = cosine_similarity(input_vector,data)
     return similarity_score
 
-def content_recommendation(song_name,artist_name,songs_data,transformed_data,k=10):
+def recommend(song_name,songs_data,transformed_data,k=10):
     #convert song name to lower case 
     song_name = song_name.lower()
     #filter out the song from data
