@@ -55,11 +55,14 @@ def calculate_cosine_similarity(input_vector,data):
     similarity_score  = cosine_similarity(input_vector,data)
     return similarity_score
 
-def recommend(song_name,songs_data,transformed_data,k=10):
+def content_recommendation(song_name,artist_name,songs_data,transformed_data,k=10):
     #convert song name to lower case 
     song_name = song_name.lower()
+     # convert the artist name to lowercase
+    artist_name = artist_name.lower()
+    
     #filter out the song from data
-    song_row = songs_data.loc[(songs_data["name"] == song_name)]
+    song_row = songs_data.loc[(songs_data["name"] == song_name) & (songs_data["artist"] == artist_name)]
 
     #get the index of the song
     song_index = song_row.index[0]
@@ -75,55 +78,24 @@ def recommend(song_name,songs_data,transformed_data,k=10):
     top_k_list = top_k_songs_names[['name','artist','spotify_preview_url']].reset_index(drop=True)
     return top_k_list
 
-def main():
+
+def main(data_path):
+
     # load the data
     data = pd.read_csv(data_path)
-
-    #clean the data
-    data_content_filtering = data_for_content_filtering(data)
-
-    #train the transformer
-    train_transformer(data_content_filtering)
-
-    #transform the data
-    transformed_data = transform_data(data_content_filtering)
-
-    #save the data
-    save_transformed_data(transformed_data,"data/transformed_data.npz")
-
-def test_recommendations(data_path,song_name,k=10):
-    #convert song name to lower case 
-    song_name = song_name.lower()
-    # load the data
-    data = pd.read_csv(data_path)
+   
     # clean the data
     data_content_filtering = data_for_content_filtering(data)
-    #train the transformers
-    train_transformer(data_content_filtering)
+    
     #transform the data
     train_transformer(data_content_filtering)
+    
     #transform the data
     transformed_data = transform_data(data_content_filtering)
+    
     #save the data
     save_transformed_data(transformed_data,"data/transformed_data.npz")
-    #filter out the song from data
-    song_row = data.loc[data['name']== song_name]
-    print(song_row)
-    #get the index of the song
-    song_index = song_row.index[0]
-    #genrate the input vector
-    input_vector = transformed_data[song_index].reshape(1,-1)
-    #calculate the similarity score
-    similarity_scores = cosine_similarity(input_vector,transformed_data)
-    # get top k songs
-    top_k_songs_indexes=np.argsort(similarity_scores.ravel())[-11:][::-1]
-    #get the top k songs name
-    top_k_songs_names = data.iloc[top_k_songs_indexes]
-    #print the top k songs
-    top_k_list = top_k_songs_names[['name','artist','spotify_preview_url']].reset_index(drop=True)
-    return top_k_list
-
-
-
+   
+    
 if __name__ == "__main__":
-    test_recommendations(CLEANED_DATA_PATH, "Hips Don't Lie")
+    main(CLEANED_DATA_PATH)

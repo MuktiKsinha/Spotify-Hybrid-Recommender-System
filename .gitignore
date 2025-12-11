@@ -175,9 +175,15 @@ cython_debug/
 data/cleaned_data.csv
 
 # virtualenv
-spotify/
 .vscode
+spotify_clean/
 
 # transformer object
 transformer.joblib
+
+/item_user_data
+/collab_filtered_data.csv
+/interaction_matrix.npz
+/item_user_data.csv
+/track_ids.np
 
