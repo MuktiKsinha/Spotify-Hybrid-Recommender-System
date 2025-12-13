@@ -30,65 +30,143 @@ st.session_state.interaction_matrix = load_npz(interaction_matrix_path)
 transformed_hybrid_data_path = "data/transformed_hybrid_data.npz"
 st.session_state.transformed_hybrid_data = load_npz(transformed_hybrid_data_path)
 
+##APP header
+st.markdown(
+    """
+    <style>
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .animated-title {
+        font-size: 46px;
+        font-weight: 800;
+        text-align: center;
+        background: linear-gradient(
+            270deg,
+            #1DB954,
+            #1ed760,
+            #00ffaa
+        );
+        background-size: 600% 600%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradient 6s ease infinite;
+    }
+    .subtitle {
+        text-align: center;
+        font-size: 18px;
+        color: #b3b3b3;
+        margin-top: 6px;
+    }
+    </style>
 
-#title
-st.title('Welcome to the Spotify Song Recommender!')
+    <div class="animated-title">🎵 Spotify Song Recommender</div>
+    <div class="subtitle">
+        Discover personalized and diverse music recommendations
+    </div>
+    <hr>
+    """,
+    unsafe_allow_html=True
+)
+####LAYOYT END###
 
-# subheader
-st.subheader('### Enter the name of a song and the recommender will suggest similar songs 🎵🎧')
+## slider
+st.markdown("### 🔍 Song Details")
 
-#text input
-song_name = st.text_input('Enter a song name')
-st.write('You entered:',song_name)
+col1, col2 = st.columns(2)
 
+with col1:
+    song_name = st.text_input(
+        "🎶 Song Name",
+        placeholder="e.g. Beat it",
+        help="Type the exact song name as it appears on Spotify"
+    )
 
-# artist name
-artist_name = st.text_input('Enter the artist name:')
-st.write('You entered:', artist_name)
+with col2:
+    artist_name = st.text_input(
+        "🎤 Artist Name",
+        placeholder="e.g. Michael Jackson",
+        help="Enter the primary artist name"
+    )
 
-# lowercase the input
-song_name = song_name.lower()
-artist_name = artist_name.lower()
+st.markdown("### 🎯 Recommendation Count")
 
+k = st.select_slider(
+    "Number of songs to recommend",
+    options=[5, 10, 15, 20],
+    value=10
+)
 
-# k reccomendations
-k = st.selectbox('How many recommendations do you want?', [5,10,15,20], index=1)
+# Normalize input
+song_name = song_name.strip().lower()
+artist_name = artist_name.strip().lower()
+
+###slider
 
 if ((st.session_state.filtered_data["name"] == song_name) & (st.session_state.filtered_data["artist"] == artist_name)).any():
-    filtering_type = st.selectbox(label= 'Select the type of filtering:', 
-                                options= ['Content-Based Filtering', 
-                                            'Collaborative Filtering',
-                                            "Hybrid Recommender System"],
-                                index= 2)
-    #diversity slider
+    st.markdown("### ⚙️ Recommendation Settings")
+
+    filtering_type = st.selectbox(
+        label='Select recommendation method',
+        options=[
+            'Content-Based Filtering',
+            'Collaborative Filtering',
+            'Hybrid Recommender System'
+        ],
+        index=2
+    )
+
+    # Diversity slider
+    st.markdown("#### 🎚️ Recommendation Style")
+
     col1, col2 = st.columns([1, 1])
     with col1:
         st.markdown("⬅️ **Personalized**")
     with col2:
-        st.markdown("<div style='text-align: right'>Diverse** ➡️</div>", unsafe_allow_html=True)
-    diversity = st.slider(label="Diversity in Recommendations",
-                        min_value=1,
-                        max_value=10,
-                        value=5,
-                        step=1)
-    content_based_weight = 1 - (diversity/10)
+        st.markdown(
+            "<div style='text-align: right'>Diverse ➡️</div>",
+            unsafe_allow_html=True
+        )
+
+    diversity = st.slider(
+        label="",
+        min_value=1,
+        max_value=10,
+        value=5,
+        step=1
+    )
+
+    content_based_weight = 1 - (diversity / 10)
+
 
 else:
     #type of filtering 
     filtering_type = st.selectbox(label= 'Select the type of filtering:', 
                                 options= ['Content-Based Filtering'])
+    
+
+# ✅ BUTTON GOES HERE
+st.markdown("<br>", unsafe_allow_html=True)
+get_rec = st.button(
+    "🎧 Get Recommendations",
+    use_container_width=True,
+    disabled=not (song_name and artist_name)
+)
 
 #button
 if filtering_type == 'Content-Based Filtering':
-    if st.button('Get Recommendations'):
+    if get_rec:
         if ((st.session_state.songs_data["name"] == song_name) & (st.session_state.songs_data['artist'] == artist_name)).any():
             st.write('Recommendations for', f"**{song_name}** by **{artist_name}**")
-            recommendations =content_recommendation(song_name=song_name,
-                                                artist_name=artist_name,
-                                                songs_data=st.session_state.songs_data,
-                                                transformed_data=st.session_state.transformed_data,
-                                                k=k
-            )
+            with st.spinner("Finding the perfect tracks for you 🎶"):
+                recommendations =content_recommendation(song_name=song_name,
+                                                    artist_name=artist_name,
+                                                    songs_data=st.session_state.songs_data,
+                                                    transformed_data=st.session_state.transformed_data,
+                                                    k=k
+                )
 
             #display recommmendation
             for ind,recommendation in recommendations.iterrows():
@@ -115,15 +193,16 @@ if filtering_type == 'Content-Based Filtering':
 
 
 elif filtering_type == 'Collaborative Filtering':
-    if st.button('Get Recommendations'):
+    if get_rec:
         if ((st.session_state.filtered_data["name"] == song_name) & (st.session_state.filtered_data["artist"] == artist_name)).any():
             st.write('Recommendations for', f"**{song_name}** by **{artist_name}**")
-            recommendations = collaborative_recommendation(song_name=song_name,
-                                                           artist_name=artist_name,
-                                                           track_ids=st.session_state.track_ids,
-                                                           songs_data=st.session_state.filtered_data,
-                                                           interaction_matrix=st.session_state.interaction_matrix,
-                                                           k=k)
+            with st.spinner("Finding the perfect tracks for you 🎶"):
+                recommendations = collaborative_recommendation(song_name=song_name,
+                                                            artist_name=artist_name,
+                                                            track_ids=st.session_state.track_ids,
+                                                            songs_data=st.session_state.filtered_data,
+                                                            interaction_matrix=st.session_state.interaction_matrix,
+                                                            k=k)
             
 
             # Display Recommendations
@@ -149,7 +228,7 @@ elif filtering_type == 'Collaborative Filtering':
             st.write(f"Sorry, we couldn't find {song_name} in our database. Please try another song.")
 
 elif filtering_type == "Hybrid Recommender System":
-    if st.button('Get Recommendations'):
+    if get_rec:
         if ((st.session_state.filtered_data["name"] == song_name) & (st.session_state.filtered_data["artist"] == artist_name)).any():
             st.write('Recommendations for', f"**{song_name}** by **{artist_name}**")
             recommender = HybridRecommenderSystem(
@@ -157,13 +236,14 @@ elif filtering_type == "Hybrid Recommender System":
                               weight_content_based = content_based_weight)
             
             # get the recommendations
-            recommendations = recommender.give_recommendations(song_name=song_name,
-                                                               artist_name=artist_name,
-                                                               songs_data=st.session_state.filtered_data,
-                                                               transformed_matrix=st.session_state.transformed_hybrid_data,
-                                                               track_ids= st.session_state.track_ids,
-                                                               interaction_matrix= st.session_state.interaction_matrix)
-            
+            with st.spinner("Finding the perfect tracks for you 🎶"):
+                recommendations = recommender.give_recommendations(song_name=song_name,
+                                                                artist_name=artist_name,
+                                                                songs_data=st.session_state.filtered_data,
+                                                                transformed_matrix=st.session_state.transformed_hybrid_data,
+                                                                track_ids= st.session_state.track_ids,
+                                                                interaction_matrix= st.session_state.interaction_matrix)
+                
             # Display Recommendations
             for ind , recommendation in recommendations.iterrows():
                 song_name = recommendation['name'].title()
