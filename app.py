@@ -131,11 +131,12 @@ if ((st.session_state.filtered_data["name"] == song_name) & (st.session_state.fi
         )
 
     diversity = st.slider(
-        label="",
+        label="Diversity level",
         min_value=1,
         max_value=10,
         value=5,
-        step=1
+        step=1,
+        label_visibility="collapsed"
     )
 
     content_based_weight = 1 - (diversity / 10)
