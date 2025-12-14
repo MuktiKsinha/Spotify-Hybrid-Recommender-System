@@ -20,15 +20,15 @@ and a fully automated <strong>CI/CD pipeline</strong>.
 <h2>🎥 Project Demo</h2>
 
 <p>
-▶️ <em>Click the image to watch a 4-minute end-to-end demo showcasing the Streamlit UI,
-hybrid recommendations, and AWS CI/CD deployment.</em>
+▶️ Click the image to watch the 4-minute end-to-end demo.
 </p>
 
-<a href="https://www.youtube.com/watch?v=VIDEO_ID" target="_blank">
-  <img src="https://img.youtube.com/vi/VIDEO_ID/0.jpg"
-       alt="Hybrid Music Recommendation System Demo"
-       width="650"/>
+<a href="https://github.com/MuktiKsinha/Spotify-Hybrid-Recommender-System/releases/download/v1.0/final_demo_video.mp4">
+  <img src="assets/demo_thumbnail.png" width="650"
+       alt="Spotify Hybrid Recommendation System Demo"/>
 </a>
+
+
 
 <hr/>
 
