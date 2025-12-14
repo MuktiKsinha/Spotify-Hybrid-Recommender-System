@@ -64,4 +64,33 @@ jobs:
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
-      
+      - name: Deploy to EC2
+        if: success()
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "Configuring AWS CLI"
+            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws configure set default.region ${{ secrets.AWS_DEFAULT_REGION }}
+
+            echo "Login to Amazon ECR"
+            aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} \
+              | docker login --username AWS --password-stdin \
+              ${{ secrets.ECR_REGISTRY }}
+
+            echo "Pull latest Docker image"
+            docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_URI }}:latest
+
+            echo "Stopping old container (if exists)"
+            docker stop hybrid_resys || true
+            docker rm hybrid_resys || true
+
+            echo "Running new container"
+            docker run -d \
+              --name hybrid_resys \
+              -p 8000:8000 \
+              ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY_URI }}:latest
