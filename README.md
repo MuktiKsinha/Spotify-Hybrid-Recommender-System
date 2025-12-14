@@ -17,16 +17,13 @@ and a fully automated <strong>CI/CD pipeline</strong>.
 
 <hr/>
 
-<h2>🎥 Project Demo</h2>
+## 🎥 Project Demo
 
-<p>
-▶️ Click the image to watch the 4-minute end-to-end demo.
-</p>
+Watch the 4-minute end-to-end demo of the **Spotify Hybrid Recommendation System** by clicking the thumbnail below:
 
-<a href="https://github.com/MuktiKsinha/Spotify-Hybrid-Recommender-System/releases/download/v1.0/final_demo_video.mp4">
-  <img src="assets/demo_thumbnail.png" width="650"
-       alt="Spotify Hybrid Recommendation System Demo"/>
-</a>
+[![Spotify Hybrid Recommendation System Demo](assets/demo_thumbnail.png)](https://youtu.be/MfAYlN47FIc)
+
+> ▶️ Click the image to watch the demo on YouTube
 
 
 
