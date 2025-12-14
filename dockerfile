@@ -24,7 +24,7 @@ COPY ./data/collab_filtered_data.csv \
 COPY app.py \
      collaborative_filtering.py \
      content_based_filtering.py \
-     hybrid_recommendations.py \
+     hybrid_recommendation.py \
      data_cleaning.py \
      transform_filtered_data.py \
      ./
